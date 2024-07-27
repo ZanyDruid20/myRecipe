@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>myRecipe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #90EE90;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding-top: 30px;
+            min-height: 70px;
+           border-bottom: #ccc 3px solid;
+        }
+        header h1 {
+            text-align: center;
+            text-transform: uppercase;
+            margin: 0;
+        }
+        .form-group {
+            margin: 20px 0;
+        }
+        .form group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .form-group button {
+            padding: 10px, 20px;
+            border: none;
+            border-radius: 5px;
+            background: #333;
+            color: #fff;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background: #555;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .results ul {
+            list-style: none;
+            padding: 0;
+        }
+        .results li {
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            background: #fff;
+            border-radius: 5px;
+        }
+
+    </style>
+    </head>
+<body>
+    <header>
+        <div class="container">
+            <h1>myRecipe</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="form-group">
+            <label for="search">Search Recipes:</label>
+            <input type="text" id="search" placeholder="e.g.,deep dish pizza">
+            <button id="searchButton">Search</button>
+        </div>
+         <div class="form-group">
+            <label for="ingredients">Enter Ingredients for Recommendations:</label>
+            <textarea id="ingredients" rows="4" placeholder="e.g.,rice, carrots,beef"></textarea>
+            <button id="recommendButton">Get Recommendations</button>
+        </div>
+        <div class="results">
+            <h2>Search Results</h2>
+            <ul id="search-results-list"></ul>
+            <h2>Recommendations</h2>
+            <ul id="recommendations-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Add an event listener for the 'Get Recommendations' button click event
+        document.getElementById('recommendButton').addEventListener('click', function() {
+            // Get the value of the ingredients textarea
+            const ingredients = document.getElementById('ingredients').value;
+
+            // Send a POST request to the '/recommend' endpoint with the ingredients as JSON
+            fetch('/recommend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    'Ingredients': ingredients
+                }),
+            })
+            .then(response => response.json()) // Parse the JSON response
+            .then(data => {
+                // Get the recommendations list element
+                const recommendationsList = document.getElementById('recommendations-list');
+                recommendationsList.innerHTML = ''; // Clear previous results
+
+                // Check if any recommended recipes are returned
+                if (!data.recommended_recipes || data.recommended_recipes.length === 0) {
+                    // If no recipes are found, display a message
+                    recommendationsList.innerHTML = '<li>No recipes found.</li>';
+                } else {
+                    // For each recommended recipe, create a list item and append it to the list
+                    data.recommended_recipes.forEach(recipe => {
+                        const li = document.createElement('li');
+                        li.textContent = `${recipe.Title}: ${recipe.Cleaned_Ingredients.join(', ')}`;
+                        recommendationsList.appendChild(li);
+                    });
+                }
+            })
+            .catch(error => console.error('Error:', error)); // Handle any errors
+        });
+
+        // Add an event listener for the 'Search' button click event
+        document.getElementById('searchButton').addEventListener('click', function() {
+            // Get the value of the search input
+            const query = document.getElementById('search').value;
+
+            // Send a GET request to the '/search' endpoint with the query parameter
+            fetch(`/search?query=${encodeURIComponent(query)}`)
+            .then(response => response.json()) // Parse the JSON response
+            .then(data => {
+                // Get the search results list element
+                const searchResultsList = document.getElementById('search-results-list');
+                searchResultsList.innerHTML = ''; // Clear previous results
+
+                // Check if any search results are returned
+                if (!data || data.length === 0) {
+                    // If no recipes are found, display a message
+                    searchResultsList.innerHTML = '<li>No recipes found.</li>';
+                } else {
+                    // For each search result, create a list item and append it to the list
+                    data.forEach(item => {
+                        const recipe = item.recipe;
+                        const li = document.createElement('li');
+                        li.textContent = `${recipe.label}: ${recipe.ingredientLines.join(', ')}`;
+                        searchResultsList.appendChild(li);
+                    });
+                }
+            })
+            .catch(error => console.error('Error:', error)); // Handle any errors
+        });
+
+    </script>
+</body>
+</html>
