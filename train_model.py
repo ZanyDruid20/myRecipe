@@ -1,8 +1,22 @@
+"""
+Model Training Script
+
+Dataset Acknowledgement:
+The dataset used for this project is the 'Food Ingredients and Recipe Dataset with Image Name Mapping,'
+originally available on Kaggle through Sakshi Goel. The original author is unknown.
+
+This script performs the following tasks:
+1. Loads the dataset.
+2. Vectorizes the 'Cleaned_Ingredients' column using TF-IDF.
+3. Trains a KMeans clustering model.
+4. Saves the trained models and vectorizer.
+"""
 import os
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 import joblib
+
 
 # Ensure Model directory exists
 if not os.path.exists('Model'):
