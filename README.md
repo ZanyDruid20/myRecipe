@@ -6,3 +6,5 @@ This project benefited from the assistance of ChatGPT for debugging and suggesti
 # License: 
 This project does not have a formal license. Feel free to use, modify, and distribute this code as needed.
 
+# Clarification live demo:
+https://www.loom.com/share/1babf324d12d43f394a256859dd99604?sid=4be71558-4b5f-4aad-8d31-d24ec985d6b1
